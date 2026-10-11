@@ -28,4 +28,6 @@ HEALTH/search failures, unreadable records, charge-limit truncation, count misma
 
 The live example reads 20 listings from a ZIP with more than 20 available listings. It is not a full ZIP-market scan. A status=ok report does not establish completeness, and sampling can miss price changes. No valuation, complete market statistics or sales conclusions are provided.
 
-Price-drop, price-increase, unchanged-repeat, missing-price and absent-listing logic are tested with synthetic data. A synthetic -10% drop is not evidence of a real market price drop. Real delivery and schedule results are recorded in the publication report. Tested on self-hosted n8n 2.26.4; other versions require your setup check. No official n8n template-directory acceptance claimed.
+On 11 October 2026, two real manual snapshots and an actual timed-trigger execution each observed 20 listings. Final Google Sheets API read-back verified 20 unique keys and zero duplicates. Repeat and scheduled runs found no new IDs or price differences. Each execution launched one Actor. SEARCHES reported 221 available listings, so this verifies a small sample.
+
+Eleven synthetic scenarios cover price drops, increases, unchanged repeats, missing prices, absent listings and failure checks. The synthetic -10% drop is not evidence of a real market price drop. Tested on self-hosted n8n 2.26.4; other versions require your setup check. No official n8n template-directory acceptance claimed.
