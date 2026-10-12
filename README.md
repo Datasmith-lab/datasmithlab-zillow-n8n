@@ -2,7 +2,7 @@
 
 An inactive DataSmithLab starter for a small ZIP-level listing log. Compare prices only when the same listing is observed again.
 
-[Zillow scraper on Apify](https://apify.com/datasmithlab/zillow-property-scraper) · [Walkthrough](https://datasmith-lab.github.io/datasmithlab-zillow-n8n/) · [Download ZIP](https://github.com/Datasmith-lab/datasmithlab-zillow-n8n/releases/latest/download/zillow-prices-to-sheets-starter.zip)
+[Zillow scraper on Apify](https://apify.com/datasmithlab/zillow-property-scraper) · [Walkthrough](https://datasmith-lab.github.io/datasmithlab-zillow-n8n/) · [Download ZIP](https://github.com/Datasmith-lab/datasmithlab-zillow-n8n/releases/latest/download/zillow-prices-to-sheets-starter.zip) · [Guide with real data](https://datasmith-lab.github.io/datasmithlab-zillow-n8n/track-zillow-price-drops-google-sheets-apify-n8n.html)
 
 ## Setup
 

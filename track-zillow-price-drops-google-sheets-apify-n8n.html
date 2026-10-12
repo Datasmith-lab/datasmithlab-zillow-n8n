@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Track Zillow Price Cuts in Google Sheets with Apify &amp; n8n | DataSmithLab</title>
+  <meta name="description" content="Zillow shows price cuts one listing at a time. Pull a ZIP's listings with prices and Zillow's own price-change field, then keep a log in Google Sheets with n8n.">
+  <meta name="robots" content="index,follow,max-image-preview:large">
+  <link rel="canonical" href="https://datasmith-lab.github.io/datasmithlab-zillow-n8n/track-zillow-price-drops-google-sheets-apify-n8n.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Track Zillow Price Cuts in Google Sheets with Apify and n8n">
+  <meta property="og:description" content="Pull a ZIP's listings with prices and Zillow's own price-change field, then keep a price log in Google Sheets.">
+  <meta property="og:url" content="https://datasmith-lab.github.io/datasmithlab-zillow-n8n/track-zillow-price-drops-google-sheets-apify-n8n.html">
+  <meta name="twitter:card" content="summary">
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"Track Zillow Price Cuts in Google Sheets with Apify and n8n",
+    "description":"Pull a ZIP's listings with prices and Zillow's own price-change field, then keep a price log in Google Sheets.",
+    "datePublished":"2026-10-12",
+    "dateModified":"2026-10-12",
+    "author":{"@type":"Organization","name":"DataSmithLab"},
+    "publisher":{"@type":"Organization","name":"DataSmithLab"},
+    "mainEntityOfPage":{"@type":"WebPage","@id":"https://datasmith-lab.github.io/datasmithlab-zillow-n8n/track-zillow-price-drops-google-sheets-apify-n8n.html"}
+  }
+  </script>
+  <style>
+    :root{color-scheme:dark;--bg:#0b1119;--panel:#111c28;--text:#edf4fa;--muted:#b3c2d0;--line:#2b3a49;--accent:#ffd84a;--link:#8edcff}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:18px/1.72 system-ui,-apple-system,Segoe UI,sans-serif}
+    main{width:min(860px,100% - 40px);margin:0 auto;padding:48px 0 80px}a{color:var(--link);text-underline-offset:3px}a:hover{color:#fff}
+    .brand{font-size:13px;font-weight:800;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}.brand b{color:var(--accent)}
+    h1{max-width:760px;font-size:clamp(36px,7vw,62px);line-height:1.07;letter-spacing:-.035em;margin:30px 0 18px}
+    h2{font-size:clamp(24px,4vw,32px);line-height:1.2;letter-spacing:-.02em;margin:46px 0 12px}p,li{color:var(--muted)}strong{color:var(--text)}
+    .dek{font-size:21px;line-height:1.5;color:#d2dee8;max-width:730px}
+    .callout{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);padding:16px 20px;border-radius:10px;margin:28px 0}
+    .table{overflow-x:auto;margin:22px 0}table{border-collapse:collapse;width:100%;font-size:15px;min-width:620px}th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line)}th{color:var(--text)}
+    .steps{padding-left:24px}.steps li{padding-left:5px;margin:10px 0}.links{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}.button{display:inline-block;padding:11px 15px;border-radius:8px;background:var(--accent);color:#121820;font-weight:750;text-decoration:none}.button.secondary{background:transparent;border:1px solid var(--line);color:var(--text)}
+    footer{margin-top:54px;border-top:1px solid var(--line);padding-top:20px;font-size:14px;color:var(--muted)}
+    @media(max-width:600px){main{width:min(100% - 28px,860px);padding-top:30px}.dek{font-size:18px}}
+  </style>
+</head>
+<body>
+<main>
+  <p class="brand"><b>DataSmithLab</b> · Apify + n8n + Google Sheets</p>
+  <article>
+    <header>
+      <h1>Track Zillow Price Cuts in Google Sheets with Apify and n8n</h1>
+      <p class="dek">A listing page shows one home's price and its last cut. A spreadsheet can show a whole ZIP, and remember what each price was yesterday. Here is how to build that log without copying anything by hand.</p>
+    </header>
+    <p>Anyone watching a local market ends up opening listing after listing: price, days on Zillow, the little arrow that says the price went down. It is easy to miss a cut, and impossible to compare today's price with last week's unless you wrote it down. A scheduled workflow writes it down for you.</p>
+    <div class="callout"><strong>Scope:</strong> the starter reads a bounded snapshot of one ZIP, up to 20 listings by default (1 to 100 allowed). Zillow shows at most 820 homes per search, filters and limits decide what a run returns, and a small sample can miss changes. It is not a complete market scan. A listing that disappears from a later snapshot is kept in the sheet and is not marked sold.</div>
+
+    <h2>What a ZIP sample looks like</h2>
+    <p>The <a href="https://apify.com/datasmithlab/zillow-property-scraper">Zillow Scraper</a> returns prices as numbers, home details, Zestimate and rent estimate where Zillow shows them, days on Zillow, and Zillow's own last price change with its date. A real run on 12 October 2026 read 40 sale listings from ZIP 78704 in Austin, Texas, out of 336 available for that search:</p>
+    <div class="table">
+      <table>
+        <thead><tr><th scope="col">Listing</th><th scope="col">Price</th><th scope="col">Zillow price change</th><th scope="col">Change date</th></tr></thead>
+        <tbody>
+          <tr><td>3005 S 4th St #1</td><td>$2,249,000</td><td>−$241,000</td><td>2026-09-15</td></tr>
+          <tr><td>3007 Locke Ln</td><td>$1,490,000</td><td>−$209,000</td><td>2026-10-01</td></tr>
+          <tr><td>706 Barton Blvd</td><td>$3,200,000</td><td>−$200,000</td><td>2026-09-24</td></tr>
+          <tr><td>1709 Valeria St</td><td>$3,450,000</td><td>−$50,000</td><td>2026-09-29</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Of those 40 listings, 20 carried a price change reported by Zillow, a combined drop of $1,522,470 across the 20. Only 8 of the 40 showed a Zestimate, which is why it is a field to check rather than one to rely on. These numbers describe a 40-listing sample, not the Austin market.</p>
+
+    <h2>Zillow's price change versus the one your workflow sees</h2>
+    <p>These are two different things, and the starter keeps them apart. <code>zillowPriceChange</code> is what Zillow itself reports about a listing's last price change at the moment you read it. The workflow copies it to <code>sourcePriceChange</code> and does not treat it as a change between your own scans. The columns <code>previousPrice</code>, <code>priceChange</code> and <code>priceChangePct</code> are filled only when the same listing ID is observed again at a different price. The first sighting is a <code>BASELINE</code>; a lower price on a later run becomes <code>PRICE_DROP</code>, a higher one <code>PRICE_INCREASE</code>.</p>
+    <p>If a price is missing on a later run, the last known price is kept and the row is marked <code>observed-price-missing</code>. Nothing is sent as a notification; the execution summary lists the changes found in that run.</p>
+
+    <h2>Set it up</h2>
+    <ol class="steps">
+      <li>Create a <code>Listings</code> tab and paste the header row from the starter.</li>
+      <li>Import the inactive workflow and add your own Apify and Google credentials.</li>
+      <li>Enter your spreadsheet ID and a ZIP code, keep the 20-listing limit and run manually.</li>
+      <li>Run again and check that no duplicate rows appear and prices are unchanged.</li>
+      <li>Enable the daily 09:30 UTC schedule only after both runs look right.</li>
+    </ol>
+
+    <h2>What has been tested</h2>
+    <p>On 11 October 2026 two real manual snapshots and a real timed-trigger run each observed 20 listings, and a read-back of the sheet confirmed 20 unique keys and no duplicates (tested on self-hosted n8n 2.26.4). Eleven synthetic scenarios cover price drops, increases, unchanged repeats, missing prices and failure checks. The synthetic drop proves the logic, not a real market change: no real price drop has been observed by the workflow yet. The Actor charges a small start fee plus a per-listing price, and the starter caps each run at $0.10; check the Store page for current prices.</p>
+
+    <h2>Try it</h2>
+    <p>Start with one ZIP and 20 listings, check the two runs, then schedule it.</p>
+    <div class="links">
+      <a class="button" href="https://apify.com/datasmithlab/zillow-property-scraper">Open the Apify Actor</a>
+      <a class="button secondary" href="https://github.com/Datasmith-lab/datasmithlab-zillow-n8n/releases/latest/download/zillow-prices-to-sheets-starter.zip">Download the n8n starter</a>
+      <a class="button secondary" href="https://github.com/Datasmith-lab/datasmithlab-zillow-n8n#setup">Read the setup guide</a>
+    </div>
+  </article>
+  <footer>DataSmithLab · Public listing data only; agent names and contact details are not collected · Independent starter; not an official n8n directory listing. Not affiliated with Zillow.</footer>
+</main>
+</body>
+</html>
